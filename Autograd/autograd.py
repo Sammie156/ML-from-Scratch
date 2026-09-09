@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Value:
     def __init__(self, data) -> None:
         self.data = data
@@ -24,6 +25,19 @@ class Value:
         for v in reversed(topo):
             v._backward()
 
+    def __neg__(self):
+        result = Value(-self.data)
+        result._prev.add(self)
+
+        def _backward():
+            self.grad += -result.grad
+
+        result._backward = _backward
+        return result
+    
+    def __sub__(self, other):
+        return self + (-other)
+
     def __add__(self, other):
         result = Value(self.data + other.data)
         result._prev.add(self)
@@ -34,7 +48,6 @@ class Value:
             other.grad += result.grad
 
         result._backward = _backward
-
         return result
 
     def __mul__(self, other):
@@ -47,7 +60,6 @@ class Value:
             other.grad += result.grad * self.data
 
         result._backward = _backward
-
         return result
 
     def exp(self):
@@ -58,16 +70,14 @@ class Value:
             self.grad += result.grad * result.data
 
         result._backward = _backward
-
         return result
-    
+
     def tanh(self):
         result = Value(np.tanh(self.data))
         result._prev.add(self)
 
         def _backward():
             self.grad += result.grad * (1 - result.data**2)
-        
-        result._backward = _backward
 
+        result._backward = _backward
         return result

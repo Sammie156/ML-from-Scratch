@@ -1,17 +1,37 @@
 from autograd import Value
 
-x = Value(2.0)
-y = Value(3.0)
+x1 = Value(2.0)
+x2 = Value(3.0)
 
-z = x + y
-q = z * x
-r = q.tanh()
+w1 = Value(0.5)
+w2 = Value(-1.0)
 
-r.grad = 1.0
-r.backward()
+b = Value(0.5)
 
-print(x.grad)
-print(y.grad)
+y = Value(1.0)
 
-for v in r._prev:
-    print(v.data)
+z = w1 * x1 + w2 * x2 + b
+y_pred = z.tanh()
+
+print(z.data)
+print(y_pred.data)
+
+loss = (y_pred - y) * (y_pred - y)
+print(loss.data)
+
+loss.backward()
+print("w1: ", w1.grad)
+print("w2: ", w2.grad)
+print("b: ", b.grad)
+
+learning_rate = 0.1
+
+w1.data -= learning_rate * w1.grad
+w2.data -= learning_rate * w2.grad
+b.data -= learning_rate * b.grad
+
+z = w1*x1 + w2*x2 + b
+y_pred = z.tanh()
+
+loss = (y_pred - y) * (y_pred - y)
+print(loss.data)
