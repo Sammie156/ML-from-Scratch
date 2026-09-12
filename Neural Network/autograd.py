@@ -75,7 +75,7 @@ class Value:
         result._prev.add(self)
 
         def _backward():
-            self.grad += 1 - result.data**2
+            self.grad += result.grad * (1 - result.data**2)
 
         result._backward = _backward
         return result
